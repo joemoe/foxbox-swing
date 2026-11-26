@@ -1,6 +1,6 @@
-# Happy Swing 2027 – Schaukel-Simulator
+# FoxBox Swing – Schaukel-Simulator
 
-Browser-Simulator für die mohap-Schaukel: 6 Schaukeln, 6 Instrumente, 6 Lichter.
+Browser-Simulator für die mohap-Schaukel im FoxBox-Look: 6 Schaukeln, 6 Instrumente, 6 Lichter.
 Je höher eine Schaukel schwingt, desto mehr spielt ihr Instrument (3 Stufen).
 Schwingen mindestens drei im Gleichtakt, öffnet sich der Klang und alle Lichter blitzen.
 

@@ -3,80 +3,131 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Happy Swing – Schaukel-Simulator</title>
+<title>FoxBox Swing</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shrikhand&family=Lilita+One&family=Nunito:wght@500;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
-:root{--bg:#0a0c18;--panel:#13162c;--line:#252a4d;--text:#eef0ff;--mut:#8e94bd;--acc:#ff2fa8}
+/* FoxBox skin: Kaugummiautomat — royal-blue body, sunburst yellow/orange/red, cream label plates with red rims */
+:root{
+  --bg:#0f1a4d; --panel:#17266a; --panel2:#203382; --line:#2e4396;
+  --ink:#fff4d6; --muted:#a9b3dd; --fox:#ff7a1a; --glow:#ffd23f; --red:#e2261d; --redd:#a3140e; --dark:#2a0d05;
+  --sun1:#ffd23f; --sun2:#ff9a1f; --sun3:#f0471d;
+  --f-logo:"Shrikhand","Cooper Black",Georgia,serif;
+  --f-display:"Lilita One","Arial Rounded MT Bold","Arial Black",system-ui,sans-serif;
+  --f-ui:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-num:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  color-scheme:dark;
+}
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Space Grotesk',system-ui,sans-serif}
-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 8px;gap:12px;flex-wrap:wrap}
-h1{font-size:19px;margin:0;font-weight:700;letter-spacing:.01em}
-h1 span{color:var(--acc);transition:color .4s}
-.status{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--mut);flex-wrap:wrap}
-.pill{padding:4px 11px;border:1px solid var(--line);border-radius:999px;white-space:nowrap}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font-family:var(--f-ui);background:var(--bg) radial-gradient(120% 60% at 50% 0%,#1a2c7a 0%,var(--bg) 60%) no-repeat;-webkit-tap-highlight-color:transparent}
+#app{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:12px;padding:14px max(16px,env(safe-area-inset-left,0px)) 22px}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;touch-action:manipulation}
+button:focus-visible{outline:2px solid var(--glow);outline-offset:2px}
+
+/* banner */
+.banner{position:relative;height:112px;border-radius:18px;overflow:hidden;border:3px solid var(--ink);box-shadow:0 0 0 3px var(--red),0 10px 24px -10px #000;
+  background:repeating-conic-gradient(from 0deg at 30% 120%,var(--sun1) 0deg 6deg,var(--sun2) 6deg 12deg,var(--sun3) 12deg 18deg,var(--sun2) 18deg 24deg)}
+.banner .wave{position:absolute;left:0;right:0;top:0;width:100%;height:46px}
+.banner .star{position:absolute;left:190px;top:8px;width:50px;height:50px;filter:drop-shadow(0 2px 0 var(--redd))}
+.banner .logo{position:absolute;left:16px;top:18px;line-height:.85;transform:rotate(-6deg);transform-origin:left top}
+.banner .logo b{display:block;font-family:var(--f-logo);font-weight:400;font-size:38px;color:var(--ink);-webkit-text-stroke:2px var(--red);paint-order:stroke fill;text-shadow:0 3px 0 var(--red),0 5px 0 var(--redd)}
+.banner .logo small{display:block;margin:6px 0 0 40px;font-family:var(--f-logo);font-size:20px;color:var(--glow);-webkit-text-stroke:1.5px var(--red);paint-order:stroke fill;text-shadow:0 2px 0 var(--redd)}
+.banner .fox{position:absolute;right:8px;bottom:-6px;width:100px;height:100px;filter:drop-shadow(0 3px 0 rgba(42,13,5,.5))}
+.banner .tag{position:absolute;right:112px;bottom:11px;font-family:var(--f-display);font-size:13px;letter-spacing:.06em;color:var(--dark);text-transform:uppercase;background:var(--ink);border:2px solid var(--red);border-radius:6px;padding:2px 8px;transform:rotate(-3deg)}
+
+/* status */
+.status{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pill{font-family:var(--f-display);font-size:14px;letter-spacing:.04em;padding:6px 12px;border-radius:8px;background:var(--panel);border:2px solid var(--line);white-space:nowrap}
+.pill b{font-family:var(--f-num);color:var(--glow);font-weight:700}
 .sync{transition:all .2s}
-.sync.on{background:#fff;color:#0a0c18;border-color:#fff;box-shadow:0 0 22px #ffffffaa;font-weight:700}
-#stage{position:relative}
-canvas{display:block;width:100%;height:54vh;min-height:300px;max-height:560px;touch-action:manipulation;cursor:pointer}
-.bar{display:flex;gap:8px;padding:10px 18px 4px;overflow-x:auto;align-items:center;flex-wrap:wrap}
-.label{font-size:12px;color:var(--mut);margin-right:4px;text-transform:uppercase;letter-spacing:.08em}
-button{font-family:inherit;font-size:14px;color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:8px 14px;cursor:pointer;transition:all .15s;white-space:nowrap}
-button:hover{border-color:#4a518a}
-button.on{background:var(--acc);border-color:var(--acc);color:#0a0c18;font-weight:700}
-.chip.on{box-shadow:0 0 18px color-mix(in srgb,var(--acc) 60%,transparent)}
-.vol{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mut);margin-left:auto}
-input[type=range]{accent-color:var(--acc);width:110px}
-.seats{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;padding:10px 18px 14px}
-@media(max-width:760px){.seats{grid-template-columns:repeat(3,1fr)}.vol{margin-left:0}}
-.seat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 11px;cursor:pointer;user-select:none;transition:border-color .15s,transform .08s;position:relative;overflow:hidden}
+.sync.on{background:var(--ink);color:var(--red);border-color:var(--red);box-shadow:0 3px 0 var(--redd);transform:rotate(-2deg)}
+
+/* stage */
+#stage{position:relative;border-radius:18px;overflow:hidden;border:3px solid var(--ink);box-shadow:0 0 0 3px var(--red),0 10px 24px -10px #000}
+canvas{display:block;width:100%;height:52vh;min-height:300px;max-height:540px;touch-action:manipulation;cursor:pointer}
+#overlay{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(ellipse at center,#0f1a4dcc,#0f1a4df2);text-align:center;padding:20px}
+#overlay h2{font-family:var(--f-display);font-weight:400;font-size:clamp(24px,4vw,36px);color:var(--glow);margin:0 0 8px;letter-spacing:.02em}
+#overlay p{color:#c9d0ef;max-width:470px;margin:0 auto 20px;line-height:1.45;font-size:15px}
+.big{font-family:var(--f-display);font-size:20px;letter-spacing:.03em;padding:12px 28px;border-radius:14px;background:var(--red);border:3px solid var(--ink);color:var(--ink);box-shadow:0 4px 0 var(--redd),0 8px 18px -6px #000}
+.big:active{transform:translateY(2px);box-shadow:0 2px 0 var(--redd)}
+
+/* rows */
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.label{font-family:var(--f-ui);font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-right:4px}
+.chip{height:40px;padding:0 14px;border-radius:8px;background:var(--panel);border:2px solid var(--line);font-family:var(--f-display);font-size:16px;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);white-space:nowrap;transition:transform .1s}
+.chip:hover{color:var(--ink)}
+.chip.on{background:var(--ink);color:var(--red);border-color:var(--red);box-shadow:0 3px 0 var(--redd);transform:rotate(-2deg)}
+.chip.acc{background:var(--red);border-color:var(--ink);color:var(--ink);box-shadow:0 3px 0 var(--redd)}
+.chip.acc:active{transform:translateY(2px);box-shadow:0 1px 0 var(--redd)}
+.vol{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;color:var(--muted);margin-left:auto;text-transform:uppercase;letter-spacing:.1em}
+input[type=range]{accent-color:var(--red);width:120px}
+
+/* seats */
+.seats{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+@media(max-width:760px){.seats{grid-template-columns:repeat(3,1fr)}.vol{margin-left:0}.banner .star{display:none}.banner .tag{right:100px}}
+.seat{background:var(--panel);border:2px solid var(--line);border-radius:14px;padding:10px 11px;cursor:pointer;user-select:none;transition:border-color .15s,transform .08s;position:relative;overflow:hidden}
 .seat:active{transform:scale(.97)}
-.seat .n{font-size:11px;color:var(--mut);display:flex;justify-content:space-between;align-items:center}
-.seat .dot{width:10px;height:10px;border-radius:50%;background:var(--c);box-shadow:0 0 0 transparent;transition:box-shadow .1s}
-.seat .r{font-weight:600;font-size:14px;margin:4px 0 9px;min-height:2.5em;line-height:1.25}
+.seat .n{font-size:11px;font-weight:800;color:var(--muted);display:flex;justify-content:space-between;align-items:center;text-transform:uppercase;letter-spacing:.08em}
+.seat .dot{width:12px;height:12px;border-radius:50%;background:var(--c);border:2px solid var(--ink)}
+.seat .r{font-family:var(--f-display);font-size:17px;letter-spacing:.02em;margin:5px 0 9px;min-height:2.4em;line-height:1.15}
 .meter{display:flex;gap:4px}
-.meter i{flex:1;height:7px;border-radius:4px;background:#262b52;transition:background .15s}
-.meter i.f{background:var(--c)}
-.hint{font-size:12px;color:var(--mut);padding:0 18px 18px}
-kbd{font-family:inherit;border:1px solid var(--line);border-radius:4px;padding:0 5px;font-size:11px}
-#overlay{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(ellipse at center,#0a0c18cc,#0a0c18f2);text-align:center;padding:20px}
-#overlay h2{font-size:clamp(22px,4vw,34px);margin:0 0 8px}
-#overlay p{color:var(--mut);max-width:460px;margin:0 auto 18px;line-height:1.45;font-size:15px}
-#overlay button{font-size:17px;padding:12px 26px;background:var(--acc);border-color:var(--acc);color:#0a0c18;font-weight:700}
+.meter i{flex:1;height:8px;border-radius:3px;background:var(--line);transition:background .15s}
+.meter i.f{background:var(--c);box-shadow:0 0 8px -1px var(--c)}
+.foot{font-family:var(--f-display);font-size:13px;letter-spacing:.03em;color:var(--muted);text-align:center;line-height:1.6;margin:2px 0 0}
+kbd{font-family:var(--f-num);border:2px solid var(--line);border-radius:4px;padding:0 5px;font-size:11px;color:var(--ink)}
 </style>
 </head>
 <body>
-<header>
-  <h1>Happy Swing <span id="styleName">· Italo Disco</span></h1>
-  <div class="status">
-    <span class="pill" id="chordPill">–</span>
-    <span class="pill" id="bpmPill">118 BPM</span>
-    <span class="pill sync" id="syncPill">Gleichtakt: –</span>
+<div id="app">
+  <div class="banner" aria-label="FoxBox Swing">
+    <svg class="wave" viewBox="0 0 400 46" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0H400V22C340 40 290 8 220 24S100 44 0 30Z" fill="#1f3d99"/><path d="M0 30C100 44 150 18 220 24S340 40 400 22V27C340 46 290 14 220 30S100 50 0 36Z" fill="#fff4d6"/></svg>
+    <svg class="star" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4 L62 38 L98 38 L69 60 L80 95 L50 74 L20 95 L31 60 L2 38 L38 38 Z" fill="#e2261d" stroke="#a3140e" stroke-width="3" stroke-linejoin="round"/></svg>
+    <div class="logo"><b>FoxBox</b><small>Swing</small></div>
+    <span class="tag" id="styleName">Italo Disco</span>
+    <svg class="fox" viewBox="0 0 100 100" aria-hidden="true">
+      <g stroke="#2a0d05" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M17 46 L24 6 L47 30 Z" fill="#ff7a1a"/><path d="M83 46 L76 6 L53 30 Z" fill="#ff7a1a"/>
+        <path d="M25 32 L27 16 L38 28 Z" fill="#fff4d6" stroke-width="2"/><path d="M75 32 L73 16 L62 28 Z" fill="#fff4d6" stroke-width="2"/>
+        <path d="M12 46 Q50 18 88 46 Q86 72 50 95 Q14 72 12 46 Z" fill="#ff7a1a"/>
+        <path d="M14 50 Q33 60 50 93 Q24 78 14 50 Z" fill="#fff4d6" stroke-width="2"/><path d="M86 50 Q67 60 50 93 Q76 78 86 50 Z" fill="#fff4d6" stroke-width="2"/>
+        <ellipse cx="37" cy="52" rx="7" ry="8" fill="#fff"/><circle cx="39" cy="53" r="3.2" fill="#2a0d05" stroke="none"/>
+        <path d="M29 42 Q37 38 44 43" fill="none"/>
+        <path d="M57 52 Q64 46 71 52" fill="none"/><path d="M56 41 Q64 37 72 41" fill="none"/>
+        <path d="M42 74 Q51 80 61 71" fill="none" stroke-width="2.5"/>
+        <circle cx="50" cy="86" r="5.5" fill="#2a0d05"/>
+      </g></svg>
   </div>
-</header>
 
-<div id="stage">
-  <canvas id="cv"></canvas>
-  <div id="overlay">
-    <div>
-      <h2>6 Schaukeln · 6 Instrumente</h2>
-      <p>Jede Schaukel spielt ein eigenes Instrument und hat ein eigenes Licht. Je höher geschaukelt wird, desto mehr spielt es (3 Stufen). Wenn mehrere im Gleichtakt schaukeln, wird es besonders.</p>
-      <button id="startBtn">▶ Schaukeln starten</button>
+  <div class="status">
+    <span class="pill" id="chordPill">Akkord –</span>
+    <span class="pill" id="bpmPill"><b>118</b> BPM</span>
+    <span class="pill sync" id="syncPill">Gleichtakt –</span>
+  </div>
+
+  <div id="stage">
+    <canvas id="cv"></canvas>
+    <div id="overlay">
+      <div>
+        <h2>6 Schaukeln · 6 Instrumente</h2>
+        <p>Jede Schaukel spielt ein eigenes Instrument und hat ein eigenes Licht. Je höher geschaukelt wird, desto mehr spielt es (3 Stufen). Wenn mehrere im Gleichtakt schaukeln, wird es besonders.</p>
+        <button class="big" id="startBtn">▶ Schaukeln starten</button>
+      </div>
     </div>
   </div>
-</div>
 
-<div class="bar" id="styleBar"><span class="label">Stil</span></div>
-<div class="bar">
-  <span class="label">Schaukeln</span>
-  <button id="pushAll">Alle anschubsen</button>
-  <button id="party">Party-Modus</button>
-  <button id="brake">Bremsen</button>
-  <button id="pause">Pause</button>
-  <label class="vol">Lautstärke <input type="range" id="vol" min="0" max="1" step="0.01" value="0.8"></label>
+  <div class="row" id="styleBar"><span class="label">Stil</span></div>
+  <div class="row">
+    <span class="label">Schaukeln</span>
+    <button class="chip acc" id="pushAll">Alle anschubsen</button>
+    <button class="chip" id="party">Party-Modus</button>
+    <button class="chip" id="brake">Bremsen</button>
+    <button class="chip" id="pause">Pause</button>
+    <label class="vol">Lautstärke <input type="range" id="vol" min="0" max="1" step="0.01" value="0.8"></label>
+  </div>
+  <div class="seats" id="seats"></div>
+  <p class="foot">Schaukel oder Karte antippen = anschubsen · Tasten <kbd>1</kbd>–<kbd>6</kbd>, <kbd>A</kbd> alle, <kbd>P</kbd> Party · „Alle anschubsen“ aus dem Stand = Gleichtakt</p>
 </div>
-<div class="seats" id="seats"></div>
-<div class="hint">Tippe auf eine Schaukel oder eine Karte, um anzuschubsen. Tasten <kbd>1</kbd>–<kbd>6</kbd> schubsen, <kbd>A</kbd> alle, <kbd>P</kbd> Party-Modus. Tipp: „Alle anschubsen“ aus dem Stand bringt alle in den Gleichtakt.</div>
 
 <script>
 // ---------- Music theory ----------
@@ -350,9 +401,9 @@ function scheduler(){
 function applyStyle(key){
   style=STYLES[key];
   document.documentElement.style.setProperty('--acc',style.accent);
-  document.getElementById('styleName').textContent='· '+style.name;
-  document.getElementById('bpmPill').textContent=style.bpm+' BPM';
-  document.querySelectorAll('.chip').forEach(b=>b.classList.toggle('on',b.dataset.k===key));
+  document.getElementById('styleName').textContent=style.name;
+  document.getElementById('bpmPill').innerHTML='<b>'+style.bpm+'</b> BPM';
+  document.querySelectorAll('#styleBar .chip').forEach(b=>b.classList.toggle('on',b.dataset.k===key));
   buildSeats();
   if(ac){ delNode.delayTime.setTargetAtTime(60/style.bpm*0.75,ac.currentTime,0.05); }
 }
@@ -395,10 +446,10 @@ function hexA(hex,a){ const n=parseInt(hex.slice(1),16); return `rgba(${n>>16},$
 let syncFlash=0;
 function draw(){
   const {beamY,gy,x0,x1,sp,L}=geo();
-  const sky=g.createLinearGradient(0,0,0,gy); sky.addColorStop(0,'#05060f'); sky.addColorStop(1,'#141a3a');
+  const sky=g.createLinearGradient(0,0,0,gy); sky.addColorStop(0,'#0a1240'); sky.addColorStop(1,'#1f3d99');
   g.fillStyle=sky; g.fillRect(0,0,W,H);
   for(const [sx,sy,b] of stars){ g.fillStyle=`rgba(255,255,255,${0.25+0.5*b*(0.7+0.3*Math.sin(performance.now()/900+b*20))})`; g.fillRect(sx*W,sy*H,1.4,1.4); }
-  const gr=g.createLinearGradient(0,gy,0,H); gr.addColorStop(0,'#0f2a1d'); gr.addColorStop(1,'#07140d'); g.fillStyle=gr; g.fillRect(0,gy,W,H-gy);
+  const gr=g.createLinearGradient(0,gy,0,H); gr.addColorStop(0,'#13306e'); gr.addColorStop(1,'#0f1a4d'); g.fillStyle=gr; g.fillRect(0,gy,W,H-gy);
   // light pools on the grass
   g.globalCompositeOperation='lighter';
   swings.forEach((s,i)=>{ const I=[0,0.22,0.4,0.6][s.lvl]+s.flash*0.7+syncFlash*0.5; if(I<0.02) return;
@@ -408,7 +459,7 @@ function draw(){
     g.save(); g.translate(px,y); g.scale(1,0.28); g.translate(-px,-y); g.fillStyle=rg; g.beginPath(); g.arc(px,y,rx,0,Math.PI*2); g.fill(); g.restore(); });
   g.globalCompositeOperation='source-over';
   // frame
-  g.strokeStyle='#5b4632'; g.lineCap='round';
+  g.strokeStyle='#e2261d'; g.lineCap='round';
   g.lineWidth=7; [[x0-14,x0-40],[x0-14,x0+18],[x1+14,x1+40],[x1+14,x1-18]].forEach(([a,b])=>{g.beginPath();g.moveTo(a,beamY);g.lineTo(b,gy+6);g.stroke();});
   g.lineWidth=10; g.beginPath(); g.moveTo(x0-22,beamY); g.lineTo(x1+22,beamY); g.stroke();
   // swings
@@ -417,17 +468,17 @@ function draw(){
     const sw=Math.min(78,sp*0.56)*sc, half=sw/2, top=Math.min(sp*0.36,half*0.85);
     const I=[0.08,0.3,0.5,0.75][s.lvl]+s.flash*0.6+syncFlash*0.5, col=syncFlash>0.3?'#ffffff':style.colors[i];
     // ropes
-    g.strokeStyle='#c8b89a'; g.lineWidth=1.6;
+    g.strokeStyle='#fff4d6'; g.lineWidth=1.8;
     g.beginPath(); g.moveTo(px-top,beamY+4); g.lineTo(px-half+4,sy); g.moveTo(px+top,beamY+4); g.lineTo(px+half-4,sy); g.stroke();
     // kid
-    if(s.amp>0.08 || (party&&s.kid.on)){ const hy=sy-30*sc; g.fillStyle='#1d2147'; g.strokeStyle='#1d2147'; g.lineWidth=7*sc;
+    if(s.amp>0.08 || (party&&s.kid.on)){ const hy=sy-30*sc; g.fillStyle='#ff7a1a'; g.strokeStyle='#ff7a1a'; g.lineWidth=7*sc;
       g.beginPath(); g.moveTo(px,sy-4); g.lineTo(px,hy+8*sc); g.stroke(); g.beginPath(); g.arc(px,hy,8*sc,0,Math.PI*2); g.fill();
       g.lineWidth=5*sc; g.beginPath(); g.moveTo(px,sy-2); g.lineTo(px+(d>0?14:10)*sc,sy+16*sc); g.stroke(); }
     // seat + light under seat
     g.save(); g.shadowColor=col; g.shadowBlur=30*I*sc; g.fillStyle=hexA(col,0.25+I*0.75);
     g.beginPath(); g.roundRect(px-half*0.8,sy+6*sc,half*1.6,4*sc,2); g.fill(); g.restore();
-    g.fillStyle='#8a6a48'; g.beginPath(); g.roundRect(px-half,sy-3*sc,sw,9*sc,3); g.fill();
-    g.fillStyle='rgba(255,255,255,.5)'; g.font='500 11px "Space Grotesk", sans-serif'; g.textAlign='center'; g.fillText(i+1,px,gy+28);
+    g.fillStyle='#ffd23f'; g.strokeStyle='#2a0d05'; g.lineWidth=2; g.beginPath(); g.roundRect(px-half,sy-3*sc,sw,9*sc,3); g.fill(); g.stroke();
+    g.fillStyle='rgba(255,244,214,.7)'; g.font='14px "Lilita One", sans-serif'; g.textAlign='center'; g.fillText(i+1,px,gy+28);
   });
 }
 let last=performance.now();
@@ -448,8 +499,8 @@ function frame(now){
   seatEls.forEach((e,i)=>{ const s=swings[i]; if(e.lvl!==s.lvl){ e.bars.forEach((b,k)=>b.classList.toggle('f',k<s.lvl)); e.d.style.borderColor=s.lvl?style.colors[i]+'88':''; e.lvl=s.lvl; }
     e.dot.style.boxShadow=`0 0 ${4+s.flash*16}px ${style.colors[i]}`; });
   const sp=document.getElementById('syncPill'); sp.classList.toggle('on',sync.on);
-  sp.textContent=sync.n<2?'Gleichtakt: –':sync.on?'✨ Gleichtakt!':`Gleichtakt ${Math.round(sync.R*100)}%`;
-  if(curChord) document.getElementById('chordPill').textContent='Akkord '+chordName(curChord);
+  sp.textContent=sync.n<2?'Gleichtakt –':sync.on?'★ Gleichtakt!':`Gleichtakt ${Math.round(sync.R*100)}%`;
+  if(curChord) document.getElementById('chordPill').innerHTML='Akkord <b>'+chordName(curChord)+'</b>';
   requestAnimationFrame(frame);
 }
 applyStyle('italo');
