@@ -6,7 +6,7 @@ Schwingen mindestens drei im Gleichtakt, öffnet sich der Klang und alle Lichter
 
 Stile: Italo Disco, House, Techno, Lo-Fi Hip-Hop, Ambient. Alle Klänge werden live mit der Web Audio API erzeugt – keine Samples.
 
-**Live:** https://joemoe.github.io/happyswing2027/
+**Live:** https://joemoe.github.io/foxbox-swing/
 
 Bedienung: Schaukel oder Karte antippen = anschubsen, Tasten `1`–`6`, `A` = alle, `P` = Party-Modus.
 
