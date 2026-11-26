@@ -350,7 +350,34 @@ ambient:{name:'Ambient',bpm:66,swing:0,accent:'#5ef1f2',
       tone(c.ch,c.t,mtof(ns[k%ns.length]+(Math.floor(k/ns.length)%2)*12),c.d*2,{type:'triangle',cutoff:3000,gain:0.055,decay:0.3,sustain:0.2,release:0.3,del:0.45,rev:0.4}); },
     c=>{ if(c.s!=0) return; cn(c.c,2).forEach(n=>tone(c.ch,c.t,mtof(n),c.d*15,{type:'sawtooth',voices:3,spread:12,cutoff:c.l==1?800:1500,attack:2,release:2,gain:0.055,rev:0.6}));
       if(c.l==3) cn(c.c,3).forEach(n=>tone(c.ch,c.t+0.5,mtof(n),c.d*14,{type:'sine',attack:2.5,release:2,gain:0.025,rev:0.7,fl:0})); }
-  ]}
+  ]},
+xmas:{name:'Weihnachten',bpm:116,swing:0.08,accent:'#e2261d',snow:true,
+  // Jingle Bells (James Lord Pierpont, 1857 – gemeinfrei), Refrain in G-Dur
+  prog:[[43,MAJ],[43,MAJ],[43,MAJ],[43,MAJ],[36,MAJ],[43,MAJ],[45,MAJ],[38,MAJ]],
+  roles:['Weihnachts-Bass','Schlittenglocken','Kick & Snare','Glockenspiel','Jingle-Bells-Melodie','Streicher & Chor'],
+  colors:['#e2261d','#ffd23f','#2ecc71','#ffffff','#ff7a1a','#7df9ff'],
+  play:[
+    c=>{ const r=c.c[0], B={type:'triangle',cutoff:900,gain:0.4,decay:0.18,sustain:0.4,release:0.08,sub:true};
+      const P={1:{0:0,8:7},2:{0:0,4:7,8:0,12:7},3:{0:0,4:4,8:7,12:4,14:7}}[c.l]; if(P[c.s]!==undefined) tone(c.ch,c.t,mtof(r+P[c.s]),c.d*(c.l==3?1.8:3),B); },
+    c=>{ const on=c.l==1?c.s%4==0:c.l==2?c.s%2==0:true; if(!on) return;
+      const v=(c.s%4==0?0.2:c.s%2==0?0.13:0.07);
+      metal(c.ch,c.t,v,{decay:0.16,freq:9500,hp:7000,pitch:1.7,fl:0.7}); shaker(c.ch,c.t+0.006,v*0.9,{freq:8000}); },
+    c=>{ if(c.s==0||c.s==8||(c.l==3&&c.s==10)) kick(c.ch,c.t,0.85,{f0:140,f1:50,decay:0.3});
+      if(c.l>=2&&(c.s==4||c.s==12)) snare(c.ch,c.t,0.6,{nf:2200,decay:0.14,rev:0.2});
+      if(c.l==3&&(c.s==4||c.s==12)) clap(c.ch,c.t,0.5);
+      if(c.l==3&&c.bar%8==7&&c.s>=12) snare(c.ch,c.t,0.3+0.1*(c.s-12),{decay:0.08}); },
+    c=>{ const P={1:[0,8],2:[0,4,8,12],3:[0,2,4,6,8,10,12,14]}[c.l]; const k=P.indexOf(c.s); if(k<0) return;
+      const ns=[...cn(c.c,4),...cn(c.c,5)]; bell(c.ch,c.t,mtof(ns[k%ns.length]),0.07,{decay:1.4,rev:0.3}); },
+    c=>{ const M=[[[0,71,4],[4,71,4],[8,71,8]],[[0,71,4],[4,71,4],[8,71,8]],[[0,71,4],[4,74,4],[8,67,6],[14,69,2]],[[0,71,16]],
+               [[0,72,4],[4,72,4],[8,72,6],[14,72,2]],[[0,72,4],[4,71,4],[8,71,4],[12,71,2],[14,71,2]],[[0,71,4],[4,69,4],[8,69,4],[12,71,4]],[[0,69,8],[8,74,8]]][c.bar%8];
+      const e=M.find(x=>x[0]==c.s); if(!e) return; if(c.l==1&&c.s!=0) return;
+      const L={type:'square',cutoff:2800,fenv:1500,fdecay:0.1,q:1,gain:0.09,decay:0.25,sustain:0.6,release:0.12,del:0.18,rev:0.15};
+      tone(c.ch,c.t,mtof(e[1]),c.d*e[2]*0.85,L);
+      if(c.l==3) bell(c.ch,c.t,mtof(e[1]+12),0.06,{decay:1.2,rev:0.3,fl:0}); },
+    c=>{ if(c.s!=0) return; const vo=cn(c.c,2);
+      vo.forEach(n=>tone(c.ch,c.t,mtof(n),c.d*15,{type:'sawtooth',voices:3,spread:12,cutoff:c.l==1?1000:1900,attack:0.4,release:0.6,gain:0.065,rev:0.45}));
+      if(c.l==3) cn(c.c,3).forEach(n=>tone(c.ch,c.t,mtof(n),c.d*15,{type:'sawtooth',voices:2,spread:8,ftype:'bandpass',cutoff:800,q:3,attack:0.5,release:0.8,gain:0.14,rev:0.6,fl:0})); }
+  ]},
 };
 let style=STYLES.italo;
 
@@ -437,7 +464,8 @@ document.getElementById('startBtn').onclick=async()=>{
 
 // ---------- Rendering ----------
 const cv=document.getElementById('cv'), g=cv.getContext('2d');
-let W=0,H=0,DPR=1; const stars=[...Array(90)].map(()=>[Math.random(),Math.random()*0.6,Math.random()]);
+let W=0,H=0,DPR=1; const flakes=[...Array(140)].map(()=>[Math.random(),Math.random(),0.6+Math.random()*1.8,0.03+Math.random()*0.05,Math.random()*6]);
+const stars=[...Array(90)].map(()=>[Math.random(),Math.random()*0.6,Math.random()]);
 function resize(){ DPR=Math.min(2,window.devicePixelRatio||1); W=cv.clientWidth; H=cv.clientHeight; cv.width=W*DPR; cv.height=H*DPR; g.setTransform(DPR,0,0,DPR,0,0); }
 window.addEventListener('resize',resize); resize();
 const geo=()=>{ const beamY=H*0.12, gy=H*0.88, x0=W*0.07, x1=W*0.93, sp=(x1-x0)/6, L=(gy-beamY)*0.72; return {beamY,gy,x0,x1,sp,L}; };
@@ -485,6 +513,10 @@ function drawFox(px,seatY,sc,d,om){
   g.fillStyle=ink; g.beginPath(); g.arc(39,53,3.2,0,Math.PI*2); g.fill();
   FOX_LINES.forEach(p=>g.stroke(p));
   g.beginPath(); g.arc(50,86,5.5,0,Math.PI*2); g.fill();
+  if(style.snow){ // Zipfelmütze
+    g.fillStyle='#e2261d'; g.beginPath(); g.moveTo(28,34); g.quadraticCurveTo(46,-6,78,4); g.lineTo(72,34); g.closePath(); g.fill(); g.stroke();
+    g.fillStyle='#fff4d6'; g.beginPath(); g.roundRect(24,28,52,10,5); g.fill(); g.stroke();
+    g.beginPath(); g.arc(80,6,7,0,Math.PI*2); g.fill(); g.stroke(); }
   g.restore();
 }
 let syncFlash=0;
@@ -493,6 +525,7 @@ function draw(){
   const sky=g.createLinearGradient(0,0,0,gy); sky.addColorStop(0,'#0a1240'); sky.addColorStop(1,'#1f3d99');
   g.fillStyle=sky; g.fillRect(0,0,W,H);
   for(const [sx,sy,b] of stars){ g.fillStyle=`rgba(255,255,255,${0.25+0.5*b*(0.7+0.3*Math.sin(performance.now()/900+b*20))})`; g.fillRect(sx*W,sy*H,1.4,1.4); }
+  if(style.snow){ const tt=performance.now()/1000; g.fillStyle='rgba(255,244,214,.85)'; for(const [fx,fy,fr,fv,fp] of flakes){ const y=((fy+tt*fv)%1)*H, x=(fx*W+Math.sin(tt*0.8+fp)*14+W)%W; g.beginPath(); g.arc(x,y,fr,0,Math.PI*2); g.fill(); } }
   const gr=g.createLinearGradient(0,gy,0,H); gr.addColorStop(0,'#13306e'); gr.addColorStop(1,'#0f1a4d'); g.fillStyle=gr; g.fillRect(0,gy,W,H-gy);
   // light pools on the grass
   g.globalCompositeOperation='lighter';

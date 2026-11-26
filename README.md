@@ -4,7 +4,7 @@ Browser-Simulator für die mohap-Schaukel im FoxBox-Look: 6 Schaukeln, 6 Instrum
 Je höher eine Schaukel schwingt, desto mehr spielt ihr Instrument (3 Stufen).
 Schwingen mindestens drei im Gleichtakt, öffnet sich der Klang und alle Lichter blitzen.
 
-Stile: Italo Disco, House, Techno, Lo-Fi Hip-Hop, Ambient. Alle Klänge werden live mit der Web Audio API erzeugt – keine Samples.
+Stile: Italo Disco, House, Techno, Lo-Fi Hip-Hop, Ambient, Weihnachten (Jingle Bells, gemeinfrei – mit Schnee und Zipfelmützen). Alle Klänge werden live mit der Web Audio API erzeugt – keine Samples.
 
 **Live:** https://joemoe.github.io/foxbox-swing/
 
