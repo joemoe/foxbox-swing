@@ -443,6 +443,50 @@ window.addEventListener('resize',resize); resize();
 const geo=()=>{ const beamY=H*0.12, gy=H*0.88, x0=W*0.07, x1=W*0.93, sp=(x1-x0)/6, L=(gy-beamY)*0.72; return {beamY,gy,x0,x1,sp,L}; };
 cv.addEventListener('pointerdown',e=>{ const r=cv.getBoundingClientRect(), x=e.clientX-r.left, {x0,sp}=geo(); const i=Math.floor((x-x0)/sp); if(i>=0&&i<6) push(i); });
 function hexA(hex,a){ const n=parseInt(hex.slice(1),16); return `rgba(${n>>16},${(n>>8)&255},${n&255},${Math.max(0,Math.min(1,a))})`; }
+// ---------- Little fox (face from the FoxBox logo) ----------
+const FOX_FACE=[
+  ['M12 46 Q50 18 88 46 Q86 72 50 95 Q14 72 12 46 Z','#ff7a1a'],
+  ['M17 46 L24 6 L47 30 Z','#ff7a1a'],['M83 46 L76 6 L53 30 Z','#ff7a1a'],
+  ['M25 32 L27 16 L38 28 Z','#fff4d6'],['M75 32 L73 16 L62 28 Z','#fff4d6'],
+  ['M12 46 Q50 18 88 46 Q86 72 50 95 Q14 72 12 46 Z','#ff7a1a'],
+  ['M14 50 Q33 60 50 93 Q24 78 14 50 Z','#fff4d6'],['M86 50 Q67 60 50 93 Q76 78 86 50 Z','#fff4d6']
+].map(([p,c])=>[new Path2D(p),c]);
+const FOX_LINES=['M29 42 Q37 38 44 43','M57 52 Q64 46 71 52','M56 41 Q64 37 72 41','M42 74 Q51 80 61 71'].map(p=>new Path2D(p));
+function drawFox(px,seatY,sc,d,om){
+  const ink='#2a0d05', fur='#ff7a1a', cream='#fff4d6';
+  g.save(); g.lineJoin='round'; g.lineCap='round'; g.strokeStyle=ink;
+  // tail: swings opposite to the motion
+  const tw=-Math.max(-1,Math.min(1,om*0.6));
+  const tx=px+13*sc, ty=seatY-6*sc;
+  g.lineWidth=2*sc;
+  g.beginPath(); g.moveTo(tx-4*sc,ty);
+  g.quadraticCurveTo(tx+12*sc,ty-2*sc+tw*4*sc,tx+12*sc+tw*3*sc,ty-16*sc);
+  g.quadraticCurveTo(tx+4*sc,ty-14*sc,tx-2*sc,ty-6*sc); g.closePath();
+  g.fillStyle=fur; g.fill(); g.stroke();
+  g.beginPath(); g.arc(tx+11*sc+tw*3*sc,ty-15*sc,3.2*sc,0,Math.PI*2); g.fillStyle=cream; g.fill(); g.stroke();
+  // legs dangling forward
+  g.lineWidth=3.2*sc; g.strokeStyle=fur;
+  const lf=(d>0?9:5)*sc;
+  [-4,4].forEach(o=>{ g.beginPath(); g.moveTo(px+o*sc,seatY); g.lineTo(px+o*sc+lf*0.4,seatY+10*sc); g.stroke(); });
+  g.fillStyle=ink; [-4,4].forEach(o=>{ g.beginPath(); g.arc(px+o*sc+lf*0.4,seatY+10.5*sc,2*sc,0,Math.PI*2); g.fill(); });
+  // body
+  g.strokeStyle=ink; g.lineWidth=2*sc;
+  g.beginPath(); g.ellipse(px,seatY-9*sc,8.5*sc,11*sc,0,0,Math.PI*2); g.fillStyle=fur; g.fill(); g.stroke();
+  g.beginPath(); g.ellipse(px,seatY-7*sc,4.5*sc,7*sc,0,0,Math.PI*2); g.fillStyle=cream; g.fill();
+  // arms holding the ropes
+  g.strokeStyle=fur; g.lineWidth=3*sc;
+  g.beginPath(); g.moveTo(px-6*sc,seatY-14*sc); g.lineTo(px-11*sc,seatY-24*sc); g.moveTo(px+6*sc,seatY-14*sc); g.lineTo(px+11*sc,seatY-24*sc); g.stroke();
+  // head = FoxBox face
+  const k=0.36*sc, hx=px-50*k, hy=seatY-19*sc-92*k;
+  g.translate(hx,hy); g.scale(k,k);
+  g.strokeStyle=ink; g.lineWidth=3;
+  FOX_FACE.forEach(([p,c])=>{ g.fillStyle=c; g.fill(p); g.stroke(p); });
+  g.fillStyle='#fff'; g.beginPath(); g.ellipse(37,52,7,8,0,0,Math.PI*2); g.fill(); g.stroke();
+  g.fillStyle=ink; g.beginPath(); g.arc(39,53,3.2,0,Math.PI*2); g.fill();
+  FOX_LINES.forEach(p=>g.stroke(p));
+  g.beginPath(); g.arc(50,86,5.5,0,Math.PI*2); g.fill();
+  g.restore();
+}
 let syncFlash=0;
 function draw(){
   const {beamY,gy,x0,x1,sp,L}=geo();
@@ -470,10 +514,8 @@ function draw(){
     // ropes
     g.strokeStyle='#fff4d6'; g.lineWidth=1.8;
     g.beginPath(); g.moveTo(px-top,beamY+4); g.lineTo(px-half+4,sy); g.moveTo(px+top,beamY+4); g.lineTo(px+half-4,sy); g.stroke();
-    // kid
-    if(s.amp>0.08 || (party&&s.kid.on)){ const hy=sy-30*sc; g.fillStyle='#ff7a1a'; g.strokeStyle='#ff7a1a'; g.lineWidth=7*sc;
-      g.beginPath(); g.moveTo(px,sy-4); g.lineTo(px,hy+8*sc); g.stroke(); g.beginPath(); g.arc(px,hy,8*sc,0,Math.PI*2); g.fill();
-      g.lineWidth=5*sc; g.beginPath(); g.moveTo(px,sy-2); g.lineTo(px+(d>0?14:10)*sc,sy+16*sc); g.stroke(); }
+    // little fox
+    if(s.amp>0.08 || (party&&s.kid.on)) drawFox(px,sy-3*sc,sc,d,s.om);
     // seat + light under seat
     g.save(); g.shadowColor=col; g.shadowBlur=30*I*sc; g.fillStyle=hexA(col,0.25+I*0.75);
     g.beginPath(); g.roundRect(px-half*0.8,sy+6*sc,half*1.6,4*sc,2); g.fill(); g.restore();
